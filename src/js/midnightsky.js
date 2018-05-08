@@ -1,4 +1,5 @@
 import './general.js';
+import { debuglog } from 'util';
 
 /* Create a class called MidnightSky
 - Part 1 - Create and draw stationary stars
@@ -94,12 +95,148 @@ import './general.js';
   END OF PART 3 - TEST AND DEBUG YOUR CODE - YOU SHOULD SEE CONSTELLATIONS ON YOUR PAGE       
 */
 
-class MidnightSky {
+class MidnightSky{
+    constructor()
+    {
+        this.$canvas = document.querySelector("canvas");
+        this.$context = this.$canvas.getContext('2d');
+        this.$animatonFrame;
+        this.defaults = {
+            star: {
+                color: 'rgba(255, 255, 255, .5)',
+                width: 3,
+                randomWidth: true
+            },
+            line: {
+                color: 'rgba(255, 255, 255, .5)',
+                width: 0.2
+            },
+            position: {
+                x: 0,
+                y: 0
+            },
+            width: window.innerWidth,
+            height: window.innerHeight,
+            velocity: 0.1,
+            length: 100,
+            distance: 120,
+            radius: 30,
+            stars: []
+        };
+        this.config = JSON.parse(JSON.stringify(this.defaults));
+        this.setCanvas.bind(MidnightSky);
+        this.setCanvas();
+        this.setContext.bind(MidnightSky);
+        this.setContext();
+        this.setInitialPosition.bind(MidnightSky);
+        this.setInitialPosition();
+        this.createStar.bind(MidnightSky);
+        this.createStars.bind(MidnightSky);
+        this.createStars();
+        this.drawStar.bind(MidnightSky);
+        this.drawStars.bind(MidnightSky);
+        this.drawStars();
+        this.animateStars.bind(MidnightSky);
 
-    constructor() {
-        
+        //this.$animatonFrame = window.requestAnimationFrame(this.animateStars);
+
+        this.$animationFrame = window.setInterval(this.animateStars, 17);
     }
+    setCanvas()
+    {
+        this.$canvas.width = this.config.width;
+        this.$canvas.height = this.config.height;
+    }
+    setContext()
+    {
+        this.$context.strokeStyle = this.config.strokeStyle;
+        this.$context.fillStyle = this.config.fillStyle;
+        this.$context.lineWidth = this.config.lineWidth;
+    }
+    setInitialPosition()
+    {
+        this.config.x = this.$canvas.width/2;
+        this.config.y = this.$canvas.height/2;
+    }
+    createStar()
+    {
+        var newStar = JSON.parse(JSON.stringify(this.defaults.star));
+        newStar.x = Math.random()*this.$canvas.width;
+        newStar.y = Math.random()*this.$canvas.height;
+        newStar.vx = -1 + Math.random()*2;
+        newStar.vy = -1 + Math.random()*2;
+        newStar.radius = Math.random()*this.defaults.radius;
+        return newStar;
+    }
+    createStars()
+    {
+        var i;
+        for(i = 0; i < this.config.length; i++)
+        {
+            this.config.stars[i] = this.createStar();
+        }
+    }
+    drawStar(star)
+    {
+        this.$context.fillStyle = star.color;
+        this.$context.beginPath()
+        this.$context.arc(star.x, star.y, star.radius, 0, 2*Math.PI);
+        this.$context.fill();
+        this.$context.closePath();
+    }
+    drawStars()
+    {
+        this.$context.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
+        for(var i = 0; i < this.config.stars.length; i++)
+        {
+            this.drawStar(this.config.stars[i]);
+        }
+        console.log("Stars were drawn");
+    }
+    moveStar(star)
+    {
+        star.x += star.vx;
+        star.y += star.vy;
 
+        if(star.x == 0)
+        {
+            star.x = this.$canvas.width;
+        } else if(star.x == this.$canvas.width)
+        {
+            star.x = 0;
+        }
+
+        if(star.y == 0)
+        {
+            star.y = this.$canvas.height;
+        } else if (star.y == this.$canvas.height)
+        {
+            star.y = 0;
+        }
+    }
+    moveStars()
+    {
+        for(var i =0; i < this.config.stars.length; i++)
+        {
+            this.moveStar(this.config.stars[i]);
+        }
+        console.log("Stars were moved");
+    }
+    /*
+    animateStars()
+    {
+        //console.log(this);
+        this.moveStars();
+        this.drawStars();
+        //window.requestAnimationFrame(this.animateStars);
+    }
+    */
+   animateStars()
+   {
+       console.log("Beginning animation ")
+       this.moveStars();
+       this.drawStars();
+    }
     /*
     highlight(e) {
         this.config.position.x = e.pageX - this.$canvas.offsetLeft;
@@ -134,6 +271,7 @@ class MidnightSky {
 let midnightsky;
 window.addEventListener('load', () => midnightsky = new MidnightSky());
 window.addEventListener('resize', () => {
-    // cancel the animation
+    //window.cancelAnimationFrame();
+    window.clearInterval(midnightsky.$animatonFrame);
     midnightsky = new MidnightSky();
 });

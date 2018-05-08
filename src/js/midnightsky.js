@@ -165,24 +165,26 @@ class MidnightSky{
         newStar.y = Math.random()*this.$canvas.height;
         newStar.vx = -1 + Math.random()*2;
         newStar.vy = -1 + Math.random()*2;
-        newStar.radius = Math.random()*this.defaults.radius;
+        newStar.radius = this.config.star.randomWidth ? (Math.random() * this.config.star.width) : this.config.star.width;
         return newStar;
     }
     createStars()
     {
-        var i;
-        for(i = 0; i < this.config.length; i++)
+        this.$context.clearRect(0,0, this.$canvas.width, this.$canvas.height);
+        for(let i = 0; i < this.config.length; i++)
         {
-            this.config.stars[i] = this.createStar();
+            let star = this.createStar();
+            this.config.stars.push(star);
         }
     }
     drawStar(star)
     {
         this.$context.fillStyle = star.color;
         this.$context.beginPath()
-        this.$context.arc(star.x, star.y, star.radius, 0, 2*Math.PI);
+        this.$context.arc(star.x, star.y, star.radius, 0, 2*Math.PI, false);
         this.$context.fill();
         this.$context.closePath();
+
     }
     drawStars()
     {

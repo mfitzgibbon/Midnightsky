@@ -235,6 +235,8 @@ class MidnightSky{
     */
    animateStars()
    {
+       console.log(this);
+       this.$canvas.clearRect(0,0,this.$canvas.width, this.$canvas.height);
        console.log("Beginning animation ")
        this.moveStars();
        this.drawStars();

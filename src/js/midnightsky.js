@@ -137,10 +137,11 @@ class MidnightSky{
         this.drawStars.bind(MidnightSky);
         this.drawStars();
         this.animateStars.bind(MidnightSky);
-
+        this.highlight.bind(MidnightSky);
+        this.drawLines.bind(MidnightSky);
         //this.$animatonFrame = window.requestAnimationFrame(this.animateStars);
-
-        this.$animationFrame = window.setInterval(this.animateStars, 17);
+        this.$animationFrame = window.setInterval(() => {this.animateStars();}, 17);
+        this.$canvas.addEventListener('mouseover', (event) => {this.highlight(event);});
     }
     setCanvas()
     {
@@ -189,30 +190,41 @@ class MidnightSky{
     drawStars()
     {
         this.$context.clearRect(0, 0, this.$canvas.width, this.$canvas.height);
+        /*
         for(var i = 0; i < this.config.stars.length; i++)
         {
             this.drawStar(this.config.stars[i]);
-        }
-        console.log("Stars were drawn");
+        }*/
+        
+        this.config.stars.forEach(star => {
+            this.drawStar(star);
+        });
+        //console.log("Stars were drawn");
     }
     moveStar(star)
     {
         star.x += star.vx;
         star.y += star.vy;
+        //console.log("Star " + star + " x value is " + star.x);
+        //console.log("Star " + star + " y value is " + star.x);
 
-        if(star.x == 0)
+        if(star.x < 0)
         {
+            console.log("Star " + star + " x value is zero");
             star.x = this.$canvas.width;
-        } else if(star.x == this.$canvas.width)
+        } else if(star.x > this.$canvas.width)
         {
+            console.log("Star " + star + " x value is the canvas width");
             star.x = 0;
         }
 
-        if(star.y == 0)
+        if(star.y < 0)
         {
             star.y = this.$canvas.height;
-        } else if (star.y == this.$canvas.height)
+            console.log("Star " + star + " y value is zero");
+        } else if (star.y > this.$canvas.height)
         {
+            console.log("Star " + star + " y value is the canvas height");
             star.y = 0;
         }
     }
@@ -222,7 +234,7 @@ class MidnightSky{
         {
             this.moveStar(this.config.stars[i]);
         }
-        console.log("Stars were moved");
+        //console.log("Stars were moved");
     }
     /*
     animateStars()
@@ -235,13 +247,14 @@ class MidnightSky{
     */
    animateStars()
    {
-       console.log(this);
-       this.$canvas.clearRect(0,0,this.$canvas.width, this.$canvas.height);
-       console.log("Beginning animation ")
+       //console.log(this);
+       this.$context.clearRect(0,0,this.$canvas.width, this.$canvas.height);
+       //console.log("Beginning animation ")
+       //this.$animationFrame = window.setInterval(() => {this.moveStars(); this.drawStars();}, 17);
        this.moveStars();
        this.drawStars();
+       this.drawLines();
     }
-    /*
     highlight(e) {
         this.config.position.x = e.pageX - this.$canvas.offsetLeft;
         this.config.position.y = e.pageY - this.$canvas.offsetTop;
@@ -269,13 +282,13 @@ class MidnightSky{
             }
         }
     }
-    */
 }
 
-let midnightsky;
+var midnightsky;
 window.addEventListener('load', () => midnightsky = new MidnightSky());
 window.addEventListener('resize', () => {
     //window.cancelAnimationFrame();
     window.clearInterval(midnightsky.$animatonFrame);
+    //midnightsky.$context.clearRect(0,0,window.width, window.height);
     midnightsky = new MidnightSky();
 });
